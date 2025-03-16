@@ -39,8 +39,11 @@ impl Position for FloatPosition {
 
     fn shift(&mut self, from: usize, to: usize) {
         let t = self.records[to].clone();
+        let t_i = t.1;
         let f = mem::replace(&mut self.records[from], t);
+        self.records[from].1 = f.1;
         self.records[to] = f;
+        self.records[to].1 = t_i;
     }
 
     // 1, 2, 2.5, 3, 4, 5
