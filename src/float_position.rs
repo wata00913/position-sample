@@ -6,7 +6,7 @@ pub struct FloatPosition {
 }
 
 impl FloatPosition {
-    fn new() -> Self {
+    pub fn new() -> Self {
         FloatPosition { records: vec![] }
     }
 }
@@ -14,19 +14,23 @@ impl FloatPosition {
 impl Position for FloatPosition {
     fn from_keys(keys: Vec<&str>) -> Self {
         let mut pos = Self::new();
-        pos.records = keys
-            .iter()
-            .enumerate()
-            .map(|(idx, key)| (key.to_string(), idx as f64))
-            .collect();
+        for k in keys {
+            pos.add(k);
+        }
         pos
     }
 
     fn add(&mut self, key: &str) {
         let last = self.records.last();
         match last {
-            Some(l) => self.records.push((key.to_string(), l.1 + 1.0)),
-            None => self.records.push((key.to_string(), 1.0)),
+            Some(l) => {
+                if l.1 + 0.1 >= 1.0 {
+                    self.records.push((key.to_string(), (l.1 + 1.0) / 2.0))
+                } else {
+                    self.records.push((key.to_string(), l.1 + 0.1))
+                }
+            }
+            None => self.records.push((key.to_string(), 0.1)),
         }
     }
 
