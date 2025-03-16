@@ -1,4 +1,6 @@
-pub trait Position {
+use std::fmt::Debug;
+
+pub trait Position: Debug {
     fn from_keys(keys: Vec<&str>) -> Self;
     fn add(&mut self, key: &str);
     fn insert(&mut self, key: &str, idx: usize);

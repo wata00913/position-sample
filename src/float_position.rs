@@ -1,4 +1,4 @@
-use std::mem;
+use std::{fmt::Debug, mem};
 use crate::position::Position;
 
 pub struct FloatPosition {
@@ -53,3 +53,9 @@ impl Position for FloatPosition {
     }
 }
 
+impl Debug for FloatPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let indices: Vec<f64> = self.records.iter().map(|r| r.1.clone()).collect();
+        indices.fmt(f)
+    }
+}
