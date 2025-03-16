@@ -55,6 +55,12 @@ impl Position for IntPosition {
     fn keys(&self) -> Vec<String> {
         self.records.iter().map(|r| r.0.clone()).collect()
     }
+
+    fn order(&self) -> Vec<&str> {
+        let mut rs: Vec<(&str, i32)> = self.records.iter().map(|r| (r.0.as_str(), r.1)).collect();
+        rs.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        rs.iter().map(|r| r.0).collect()
+    }
 }
 
 impl Debug for IntPosition {

@@ -1,5 +1,5 @@
-use std::{fmt::Debug, mem};
 use crate::position::Position;
+use std::{fmt::Debug, mem};
 
 pub struct FloatPosition {
     records: Vec<(String, f64)>,
@@ -31,7 +31,7 @@ impl Position for FloatPosition {
     }
 
     fn insert(&mut self, key: &str, idx: usize) {
-        let both_edges = (self.records[idx-1].1, self.records[idx].1);
+        let both_edges = (self.records[idx - 1].1, self.records[idx].1);
         let pos = (both_edges.0 + both_edges.1) / 2.0;
 
         self.records.insert(idx, (key.to_string(), pos));
@@ -50,6 +50,12 @@ impl Position for FloatPosition {
 
     fn keys(&self) -> Vec<String> {
         self.records.iter().map(|r| r.0.clone()).collect()
+    }
+
+    fn order(&self) -> Vec<&str> {
+        let mut rs: Vec<(&str, f64)> = self.records.iter().map(|r| (r.0.as_str(), r.1)).collect();
+        rs.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        rs.iter().map(|r| r.0).collect()
     }
 }
 
