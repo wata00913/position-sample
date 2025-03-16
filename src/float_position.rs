@@ -31,8 +31,8 @@ impl Position for FloatPosition {
     }
 
     fn insert(&mut self, key: &str, idx: usize) {
-        let both_edges = (self.records[idx].1, self.records[idx+1].1);
-        let pos = both_edges.0 + both_edges.1 / 2.0;
+        let both_edges = (self.records[idx-1].1, self.records[idx].1);
+        let pos = (both_edges.0 + both_edges.1) / 2.0;
 
         self.records.insert(idx, (key.to_string(), pos));
     }
