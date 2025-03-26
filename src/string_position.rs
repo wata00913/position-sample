@@ -193,3 +193,45 @@ impl Debug for StringPosition {
         indices.fmt(f)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod test_mid_point {
+        use super::*;
+
+        #[test]
+        fn function_name() {
+            assert_eq!("5", mid_point("[", "]"));
+            assert_eq!("8", mid_point("5", "]"));
+            assert_eq!("9", mid_point("8", "]"));
+            assert_eq!("95", mid_point("9", "]"));
+            assert_eq!("98", mid_point("95", "]"));
+            assert_eq!("99", mid_point("98", "]"));
+            assert_eq!("995", mid_point("99", "]"));
+            assert_eq!("15", mid_point("1", "2"));
+            assert_eq!("001001", mid_point("001", "001002"));
+            assert_eq!("0010005", mid_point("001", "001001"));
+            assert_eq!("3", mid_point("[", "5"));
+            assert_eq!("2", mid_point("[", "3"));
+            assert_eq!("1", mid_point("[", "2"));
+            assert_eq!("05", mid_point("[", "1"));
+            assert_eq!("08", mid_point("05", "1"));
+        }
+
+        fn mid_point(a: &str, b: &str) -> String {
+            let pa = match a {
+                "[" => Point::Start,
+                _ => Point::Mid(a),
+            };
+            let pb = match b {
+                "]" => Point::End,
+                _ => Point::Mid(b),
+            };
+
+            let p = StringPosition::new();
+            p.mid_point(pa, pb)
+        }
+    }
+}

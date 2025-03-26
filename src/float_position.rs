@@ -72,3 +72,34 @@ impl Debug for FloatPosition {
         indices.fmt(f)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::position::*;
+
+    #[test]
+    fn from_keys() {
+        test_from_keys::<FloatPosition>();
+    }
+
+    #[test]
+    fn add() {
+        test_add::<FloatPosition>();
+    }
+
+    #[test]
+    fn insert() {
+        test_insert::<FloatPosition>();
+    }
+
+    #[test]
+    fn shift() {
+        test_shift::<FloatPosition>();
+    }
+
+    #[test]
+    fn delete() {
+        test_delete::<FloatPosition>();
+    }
+}

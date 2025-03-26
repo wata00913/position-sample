@@ -1,5 +1,5 @@
-use std::{fmt::Debug, mem};
 use crate::position::Position;
+use std::{fmt::Debug, mem};
 
 pub struct IntPosition {
     records: Vec<(String, i32)>,
@@ -70,5 +70,36 @@ impl Debug for IntPosition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let indices: Vec<i32> = self.records.iter().map(|r| r.1.clone()).collect();
         indices.fmt(f)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::position::*;
+
+    #[test]
+    fn from_keys() {
+        test_from_keys::<IntPosition>();
+    }
+
+    #[test]
+    fn add() {
+        test_add::<IntPosition>();
+    }
+
+    #[test]
+    fn insert() {
+        test_insert::<IntPosition>();
+    }
+
+    #[test]
+    fn shift() {
+        test_shift::<IntPosition>();
+    }
+
+    #[test]
+    fn delete() {
+        test_delete::<IntPosition>();
     }
 }
