@@ -12,8 +12,8 @@ pub enum Point<'a> {
 impl<'a> Point<'a> {
     fn from_str(st: &'a str) -> Self {
         match st {
-           "" => Point::Start,
-           _ => Point::Mid(st),
+            "" => Point::Start,
+            _ => Point::Mid(st),
         }
     }
 
@@ -26,7 +26,8 @@ impl<'a> Point<'a> {
 
     fn as_str(&self) -> Option<&str> {
         match self {
-            Self::Start | Self::End => None,
+            Self::End => None,
+            Self::Start => Some(""),
             Self::Mid(st) => Some(st),
         }
     }
@@ -65,38 +66,6 @@ pub struct StringPosition {
     records: Vec<(String, String)>,
 }
 
-// sample code
-// function midpoint(a, b, digits) {
-//   if (b !== null && a >= b) {
-//     throw new Error(a + ' >= ' + b)
-//   }
-//   if (a.slice(-1) === '0' || (b && b.slice(-1) === '0')) {
-//     throw new Error('trailing zero')
-//   }
-//   // padding
-//   if (b) {
-//     let n = 0
-//     while ((a.charAt(n) || '0') === b.charAt(n)) {
-//       n++
-//     }
-//     if (n > 0) {
-//       return b.slice(0, n) + midpoint(a.slice(n), b.slice(n), digits)
-//     }
-//   }
-//   const digitA = a ? digits.indexOf(a.charAt(0)) : 0
-//   const digitB = b !== null ? digits.indexOf(b.charAt(0)) : digits.length
-//   if (digitB - digitA > 1) {
-//     const midDigit = Math.round(0.5*(digitA + digitB))
-//     return digits.charAt(midDigit)
-//   } else {
-//     if (b && b.length > 1) {
-//       return b.slice(0, 1)
-//     } else {
-//       return digits.charAt(digitA) + midpoint(a.slice(1), null, digits)
-//     }
-//   }
-// }
-
 impl StringPosition {
     const DIGITS: &[u8] = b"0123456789";
     const START: &str = "";
@@ -119,8 +88,11 @@ impl StringPosition {
             (Point::Mid(ast), Point::Mid(bst)) => {
                 let n = self.padding(&ast, &bst);
                 if n > 0 {
-                    return bst.to_string()
-                        + &self.mid_point(Point::Mid(&ast[n..]), Point::Mid(&bst[n..]));
+                    return bst[0..n].to_string()
+                        + &self.mid_point(
+                            Point::from_str(ast.get(n..).unwrap_or("")),
+                            Point::from_str(bst.get(n..).unwrap_or("")),
+                        );
                 } else {
                     return self.mid_digit(a, b);
                 }
@@ -132,30 +104,22 @@ impl StringPosition {
     fn mid_digit(&self, l: Point, r: Point) -> String {
         let l_idx = self.digit_left_idx(&l);
         let r_idx = self.digit_right_idx(&r);
-        //   (35, 50)
-        //   if (digitB - digitA > 1) {
-        //     const midDigit = Math.round(0.5*(digitA + digitB))
-        //     return digits.charAt(midDigit)
-        //   } else {
-        //     (35, 40)
-        //     if (b && b.length > 1) {
-        //       return b.slice(0, 1)
-        //     } else {
-        //     (35, NULL)
-        //       3 + (5, NULL)
-        //       3 + 5 + ('', NULL)
-        //       return digits.charAt(digitA) + midpoint(a.slice(1), null, digits)
-        //     }
-        //   }
+        // (35, 50)
         if r_idx - l_idx > 1 {
             let mid_idx = (0.5 * (l_idx + r_idx) as f64).round() as usize;
             digits::string_at(mid_idx).unwrap()
         } else {
-            if let Point::Mid(st) = &r {
-                st.get(0..=0).unwrap().to_string()
-            } else {
-                let other_l = Point::from_str(&l.as_str().unwrap()[1..]);
-                digits::string_at(l_idx).unwrap() + &self.mid_point(other_l, Point::End)
+            // (35, 40)
+            match &r {
+                Point::Mid(st) if st.len() > 1 => st.get(0..=0).unwrap().to_string(),
+                _ => {
+                    // (35, NULL)
+                    // 3 + (5, NULL)
+                    // 3 + 5 + ('', NULL)
+                    let l_str = &l.as_str().unwrap();
+                    let other_l = Point::from_str(&l_str.get(1..).unwrap_or(""));
+                    digits::string_at(l_idx).unwrap() + &self.mid_point(other_l, Point::End)
+                }
             }
         }
     }
