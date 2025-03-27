@@ -170,10 +170,22 @@ impl StringPosition {
 
 impl Position for StringPosition {
     fn from_keys(keys: Vec<&str>) -> Self {
-        Self { records: vec![] }
+        let mut pos = Self::new();
+        for k in keys {
+            pos.add(k);
+        }
+        pos
     }
 
-    fn add(&mut self, key: &str) {}
+    fn add(&mut self, key: &str) {
+        let last = self.records.last();
+        let mid = match last {
+            Some(l) => self.mid_point(Point::Mid(&l.1), Point::End),
+            None => self.mid_point(Point::Start, Point::End),
+        };
+        self.records.push((key.to_string(), mid));
+    }
+
     fn insert(&mut self, key: &str, idx: usize) {}
     fn shift(&mut self, from: usize, to: usize) {}
     fn delete(&mut self, idx: usize) -> String {
@@ -183,7 +195,9 @@ impl Position for StringPosition {
         self.records.iter().map(|r| r.0.clone()).collect()
     }
     fn order(&self) -> Vec<&str> {
-        vec![]
+        let mut rs: Vec<(&str, &str)> = self.records.iter().map(|r| (r.0.as_str(), r.1.as_str())).collect();
+        rs.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        rs.iter().map(|r| r.0).collect()
     }
 }
 
@@ -197,6 +211,12 @@ impl Debug for StringPosition {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::position::*;
+
+    #[test]
+    fn add() {
+        test_add::<StringPosition>();
+    }
 
     mod test_mid_point {
         use super::*;
