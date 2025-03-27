@@ -1,11 +1,9 @@
 mod position;
 use position::*;
 mod int_position;
-use int_position::IntPosition;
 mod float_position;
 use float_position::FloatPosition;
 mod string_position;
-use string_position::{Point, StringPosition};
 
 fn main() {
     // let mut f_pos = FloatPosition::new();
@@ -21,6 +19,7 @@ fn main() {
     // }
     // println!("order {:?}", f_pos.order());
     // println!("indices {:?}", f_pos);
+    sample();
 }
 
 

@@ -17,13 +17,6 @@ impl<'a> Point<'a> {
         }
     }
 
-    fn byte_at(&self, idx: usize) -> Option<&u8> {
-        match self {
-            Self::Start | Self::End => return None,
-            Self::Mid(st) => st.as_bytes().get(idx),
-        }
-    }
-
     fn as_str(&self) -> Option<&str> {
         match self {
             Self::End => None,
@@ -34,20 +27,20 @@ impl<'a> Point<'a> {
 }
 
 mod digits {
-    const digits_bytes: &[u8] = b"0123456789";
-    const digits_str: &str = "0123456789";
+    const DIGITS_BYTES: &[u8] = b"0123456789";
+    const DIGITS_STR: &str = "0123456789";
 
     pub fn index_of(st: &str) -> Option<usize> {
         let b = st.as_bytes().get(0).unwrap();
-        digits_bytes.iter().position(|d| d == b)
+        DIGITS_BYTES.iter().position(|d| d == b)
     }
 
     pub fn max_index() -> usize {
-        digits_str.len()
+        DIGITS_STR.len()
     }
 
     pub fn str_at(idx: usize) -> Option<&'static str> {
-        digits_str.get(idx..=idx)
+        DIGITS_STR.get(idx..=idx)
     }
 
     pub fn string_at(idx: usize) -> Option<String> {
@@ -56,10 +49,6 @@ mod digits {
             None => None,
         }
     }
-
-    pub fn byte_at(idx: usize) -> Option<&'static u8> {
-        digits_bytes.get(idx)
-    }
 }
 
 pub struct StringPosition {
@@ -67,7 +56,6 @@ pub struct StringPosition {
 }
 
 impl StringPosition {
-    const DIGITS: &[u8] = b"0123456789";
     const START: &str = "";
 
     pub fn new() -> Self {
@@ -186,9 +174,9 @@ impl Position for StringPosition {
         self.records.push((key.to_string(), mid));
     }
 
-    fn insert(&mut self, key: &str, idx: usize) {}
-    fn shift(&mut self, from: usize, to: usize) {}
-    fn delete(&mut self, idx: usize) -> String {
+    fn insert(&mut self, _key: &str, _idx: usize) {}
+    fn shift(&mut self, _from: usize, _to: usize) {}
+    fn delete(&mut self, _idx: usize) -> String {
         String::new()
     }
     fn keys(&self) -> Vec<String> {
