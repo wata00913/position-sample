@@ -1,6 +1,6 @@
 use crate::position::Position;
 use std::fmt::Debug;
-use std::vec;
+use std::{mem, vec};
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub enum Point<'a> {
@@ -174,16 +174,38 @@ impl Position for StringPosition {
         self.records.push((key.to_string(), mid));
     }
 
-    fn insert(&mut self, _key: &str, _idx: usize) {}
-    fn shift(&mut self, _from: usize, _to: usize) {}
-    fn delete(&mut self, _idx: usize) -> String {
-        String::new()
+    fn insert(&mut self, key: &str, idx: usize) {
+        let mid = match (self.records.get(idx - 1), self.records.get(idx)) {
+            (None, Some(r)) => self.mid_point(Point::Start, Point::Mid(&r.1)),
+            (Some(l), None) => self.mid_point(Point::Mid(&l.1), Point::End),
+            (Some(l), Some(r)) => self.mid_point(Point::Mid(&l.1), Point::Mid(&r.1)),
+            (None, None) => self.mid_point(Point::Start, Point::End),
+        };
+        self.records.insert(idx, (key.to_string(), mid));
     }
+
+    fn shift(&mut self, from: usize, to: usize) {
+        let t = self.records[to].clone();
+        let t_i = t.1.clone();
+        let f = mem::replace(&mut self.records[from], t);
+        self.records[from].1 = f.1.clone();
+        self.records[to] = f;
+        self.records[to].1 = t_i;
+    }
+    fn delete(&mut self, idx: usize) -> String {
+        self.records.remove(idx).0
+    }
+
     fn keys(&self) -> Vec<String> {
         self.records.iter().map(|r| r.0.clone()).collect()
     }
+
     fn order(&self) -> Vec<&str> {
-        let mut rs: Vec<(&str, &str)> = self.records.iter().map(|r| (r.0.as_str(), r.1.as_str())).collect();
+        let mut rs: Vec<(&str, &str)> = self
+            .records
+            .iter()
+            .map(|r| (r.0.as_str(), r.1.as_str()))
+            .collect();
         rs.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
         rs.iter().map(|r| r.0).collect()
     }
@@ -202,8 +224,28 @@ mod tests {
     use crate::position::*;
 
     #[test]
+    fn from_keys() {
+        test_from_keys::<StringPosition>();
+    }
+
+    #[test]
     fn add() {
         test_add::<StringPosition>();
+    }
+
+    #[test]
+    fn insert() {
+        test_insert::<StringPosition>();
+    }
+
+    #[test]
+    fn shift() {
+        test_shift::<StringPosition>();
+    }
+
+    #[test]
+    fn delete() {
+        test_delete::<StringPosition>();
     }
 
     mod test_mid_point {
